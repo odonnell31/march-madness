@@ -1,0 +1,151 @@
+---
+title: "March_Madness_Initial Summary"
+author: "OD"
+date: "March 14, 2018"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r echo=FALSE, include=FALSE}
+# To ensure I'm working in the right directory..
+getwd()
+setwd("C:/Users/ODsLaptop/Documents/Repos/march-madness")
+list.files()
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using
+# in your analysis in this code chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk.
+# This prevents the code from displaying in the knitted HTML output.
+# You should set echo=FALSE for all code chunks in your file.
+
+library(ggplot2)
+library(gridExtra)
+library(grid)
+library(GGally)
+library(dplyr)
+library(RColorBrewer)
+```
+
+```{r echo=FALSE, Load_the_Data}
+#Loading the data
+MM_data <- read.csv('MM_data.csv')
+FF_data <- read.csv('FF_data1.csv')
+```
+
+```{r echo=FALSE}
+# structure of the data and such
+names(MM_data)
+str(MM_data)
+head(MM_data, 5)
+```
+
+## Graph 1: Winners by count
+
+```{r}
+#arrange(MM_data, desc(Winner))
+
+ggplot(data = MM_data, aes(x=Winner)) +
+    geom_bar(stat="count", color = "black") +
+    xlab("Team") +
+    ylab("Count") +
+    ggtitle("Barry Goodman Champion Selections by Quantity") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+	#scale_y_continuous(breaks = seq(0,40,3))
+```
+
+## Graph 2: Winners by conference
+
+```{r}
+arrange(MM_data, desc(WinnerConference))
+
+ggplot(data = MM_data, aes(x=WinnerConference)) +
+    geom_bar(stat="count", color = "black") +
+    xlab("Conference") +
+    ylab("Count") +
+    ggtitle("Barry Goodman Champion Selections by Conference") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+	#scale_y_continuous(breaks = seq(0,40,3))
+```
+
+## Graph 3: Final Four picks by quantity
+
+```{r}
+arrange(FF_data, desc(Team))
+
+ggplot(data = FF_data, aes(x=Team)) +
+    geom_bar(stat="count", color = "black") +
+    xlab("Team") +
+    ylab("Count") +
+    ggtitle("Barry Goodman Final Four Teams by Quantity") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+	  scale_y_continuous(breaks = seq(0,20,2))
+```
+
+## Graph 4: Final Four Conferences by quantity
+
+```{r}
+arrange(FF_data, desc(Conference))
+
+ggplot(data = FF_data, aes(x=Conference)) +
+    geom_bar(stat="count", color = "black") +
+    xlab("Team") +
+    ylab("Count") +
+    ggtitle("Barry Goodman Final Four Conferences by Quantity") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+	#scale_y_continuous(breaks = seq(0,40,3))
+```
+
+## Graph 5: Owners Defensive vs Offensive Picks
+
+```{r}
+# Give some description...
+# Further to the right shows picks with better defensive ratings
+# Closer to the top shows picks with better offensive ratings
+# For reference: asaf looks to have picked based on highest scoring teams..
+
+ggplot(MM_data, aes(x=FinalFourDefense, y=FinalFourOffense)) +
+  geom_point() + 
+  geom_label(label=MM_data$Owner, nudge_x = 0.25, nudge_y = 0.25) +
+  xlab("Defensive Rating") +
+  ylab("Offensive Rating") +
+  ggtitle("Barry Goodman Owners Defensive vs Offensive picks")
+  #scale_y_continuous(breaks = seq(0,40,3))
+  #scale_x_continuous(breaks = seq(0,40,3))
+```
+
+## Graph 6: Top Riskiest Brackets
+```{r}
+
+top_risky <- MM_data[order(-MM_data$SumOfFinalFours, MM_data$WinnerSeed),]
+
+top_risky[,c("Owner","SumOfFinalFours")]
+```
+
+## Graph 7: Top Safest Brackets (The Mike Porter Trophy)
+```{r}
+
+top_risky <- MM_data[order(MM_data$SumOfFinalFours, MM_data$WinnerSeed),]
+
+top_risky[,c("Owner","SumOfFinalFours")]
+```
+
+## Graph 8: Owners' Weight on Strength of Schedule
+```{r}
+
+arrange(MM_data, desc(FinalFourSS))
+
+ggplot(data = MM_data, aes(x=Owner, y=FinalFourSS)) +
+    geom_bar(stat="identity", color = "black") +
+    xlab("Owner") +
+    ylab("Final4 Strength of Sched.") +
+    ggtitle("Owners' Weight on Strength of Schedule") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+	#scale_y_continuous(breaks = seq(0,40,3))
+```
